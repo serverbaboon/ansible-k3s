@@ -1,0 +1,25 @@
+- name: Checking for existance of k3s
+  stat:
+    path: "{{ k3s_install_path }}/k3s"
+  register: upgrade
+#  delegate_to:  "{{ masterserver }}"
+  run_once: true
+
+- debug:
+    var:   upgrade.stat.exists
+
+- name: Downloading k3s binary
+  get_url:
+    url: "{{ k3s_base_url }}/{{ k3s_version }}/k3s{{ k3s_arch }}"
+    dest: "{{ k3s_install_path }}/k3s"
+    owner: root
+    group: root
+    mode: 0755
+    checksum: "sha256:{{ k3s_base_url }}/{{ k3s_version }}/sha256sum{{ k3s_arch }}.txt"
+  register: k3s_copy
+
+- debug:
+    var:  k3s_copy.changed
+
+#- notify: Its_an_upgrade
+#  when: uppgrade.stat.exists and k3s_copy.changed

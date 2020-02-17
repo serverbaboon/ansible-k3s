@@ -1,0 +1,66 @@
+---
+
+- hosts:  all
+  become: yes
+  remote_user: ubuntu
+  gather_facts: yes
+
+  pre_tasks:
+
+    - import_tasks: tasks/k3s_prereqs.yml
+      tags: ['always']
+
+    - import_tasks: tasks/os_prereqs.yml
+      when: k3s_prereqs
+      tags: ['always']
+
+    - name: Update apt cache and upgrade all packages to the latest versions
+      apt:
+        upgrade: full
+        update_cache: yes
+      when: k3s_apt_upgrades
+      tags: ['always']
+
+    - name: Set the master server ip
+      set_fact:
+        masterserver: "{{ hostvars['master']['ansible_host'] }}"
+      tags: ['always']
+
+  vars_files:
+    - vars/packages.yml
+    - vars/vars.yml
+
+  tasks:
+    - import_tasks: tasks/disable_swap.yml
+      when: k3s_prereqs
+      tags: ['always']
+
+    - import_tasks: tasks/download_k3s.yml
+      tags: ['always']
+
+  handlers:
+
+    - name: Reboot Hosts
+      reboot:
+
+- hosts:  master
+  become: yes
+  remote_user: ubuntu
+  gather_facts: no
+  vars_files:
+    - vars/vars.yml
+
+  tasks:
+    - import_tasks: tasks/masters.yml
+
+- hosts:  workers
+  become: yes
+  remote_user: ubuntu
+  gather_facts: no
+  vars_files:
+    - vars/vars.yml
+
+  tasks:
+    - import_tasks: tasks/workers.yml
+      tags: ['workers']
+

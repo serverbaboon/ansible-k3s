@@ -1,0 +1,41 @@
+
+k3s_base_url: https://github.com/rancher/k3s/releases/download
+
+
+k3s_arch: ''
+
+k3s_install_path: /usr/local/bin/
+
+k3s_apt_upgrades: false
+k3s_prereqs:  false
+k3s_allow_upgrade: false
+
+kubeconfig_path: ~/.kube
+kubeconfig_file:  config
+
+k3s_version: v1.0.1
+
+
+k3s_no_deploy:
+  - local-storage
+
+k3s_server_options:
+  - --cluster-cidr "10.66.0.0/16"
+  - --service-cidr "10.67.0.0/16"
+  - --cluster-dns   10.67.0.10
+
+k3s_server_labels:
+  - raspberry=p4
+  - location=server-cupboard
+
+k3s_server_taints:
+
+k3s_worker_options:
+
+k3s_worker_labels:
+  - raspberry=p4
+  - location=bedroom
+
+k3s_worker_taints:
+
+

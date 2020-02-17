@@ -1,0 +1,82 @@
+
+- name: Copy over service files
+  template:
+    src:  "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+    owner:  root
+    group:  root
+  with_items:
+    - { src: '../templates/k3s-master-service.j2', dest: '/etc/systemd/system/k3s.service', mode: '0644' }
+    - { src: '../templates/k3s-master-service-env.j2', dest: '/etc/systemd/system/k3s.service.env', mode: '0644' }
+  register: service_files
+
+
+- name: Copy over utility scripts
+  template:
+    src:  "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+    owner:  root
+    group:  root
+  with_items:
+    - { src: '../templates/k3s_master_uninstall.sh.j2', dest: '/usr/local/bin/k3s-uninstall.sh', mode: '0755' }
+    - { src: '../templates/k3-killall.sh.j2', dest: '/usr/local/bin/k3s-killall.sh', mode: '0755' }
+
+
+- name: Create symlinks if they do not exist
+  file:
+    src:  "{{ k3s_install_path }}/{{ item.src }}"
+    dest: "{{ k3s_install_path }}/{{ item.dest }}"
+    mode: "{{ item.mode }}"
+    owner:  root
+    group:  root
+    state: link
+  with_items:
+    - { src: 'k3s', dest: 'kubectl', mode: '0755' }
+    - { src: 'k3s', dest: 'crictl', mode: '0755' }
+    - { src: 'k3s', dest: 'ctr', mode: '0755' }
+
+
+- name: Start master service
+  systemd:
+    state: started
+    name: k3s
+    daemon_reload: yes
+    enabled: yes
+    masked: no
+
+
+- name: Ensure ~/.kube directory exists.
+  file:
+    path: "{{ kubeconfig_path }}"
+    state: directory
+  delegate_to: localhost
+  become: false
+  run_once: true
+
+- name: Copy K3s config file from master to local.
+  fetch:
+    src: /etc/rancher/k3s/k3s.yaml
+    dest: "{{ kubeconfig_path }}/{{ kubeconfig_file }}"
+    flat: true
+    backup: yes
+  run_once: true
+
+
+- name: Modify Kube Master address
+  replace:
+    path: "{{ kubeconfig_path }}/{{ kubeconfig_file }}"
+    regexp: https://127.0.0.1:6443
+    replace: https://{{ masterserver }}:6443
+    backup: yes
+  become: false
+  delegate_to: localhost
+
+- name: This is an k3s upgrade
+  include_tasks: upgrade-master.yml
+  when: upgrade.stat.exists and k3s_copy.changed and k3s_allow_upgrade
+
+- name: This is a an option change
+  include_tasks: upgrade-master.yml
+  when: service_files.changed and upgrade.stat.exists

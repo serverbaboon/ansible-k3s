@@ -1,0 +1,58 @@
+
+- name: Get Node Token
+  slurp:
+    src: /var/lib/rancher/k3s/server/node-token
+  register: encoded_agent_token
+  delegate_to: "{{ masterserver }}"
+  run_once: true
+
+- name: Set the token
+  set_fact:
+    agent_token: "{{ encoded_agent_token['content'] | b64decode | trim }}"
+  run_once: true
+
+- debug:
+    msg: "{{ agent_token }}"
+  run_once: true
+
+- name: Copy over service files
+  template:
+    src:  "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+    owner:  root
+    group:  root
+  with_items:
+    - { src: '../templates/k3s-worker-service.j2', dest: '/etc/systemd/system/k3s-agent.service', mode: '0644' }
+    - { src: '../templates/k3s-worker-service-env.j2', dest: '/etc/systemd/system/k3s-agent.service.env', mode: '0644' }
+  register: worker_service
+
+- name: Copy over scripts
+  template:
+    src:  "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+    owner:  root
+    group:  root
+  with_items:
+    - { src: '../templates/k3s_agent_uninstall.sh.j2', dest: '/usr/local/bin/k3s-agent-uninstall.sh', mode: '755' }
+    - { src: '../templates/k3-killall.sh.j2', dest: '/usr/local/bin/k3s-killall.sh', mode: '755' }
+
+- name: start k3s service
+  systemd:
+    state: started
+    name: k3s-agent
+    daemon_reload: yes
+    enabled: yes
+    masked: no
+
+
+- name: This is an upgrade
+  include_tasks: upgrade-worker.yml
+  when: upgrade.stat.exists and k3s_copy.changed and k3s_allow_upgrade
+
+- name: This is a an option change
+  include_tasks: upgrade-worker.yml
+  when: worker_service.changed and upgrade.stat.exists and k3s_allow_upgrade
+
+

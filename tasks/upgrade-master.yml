@@ -1,0 +1,21 @@
+
+  - name: Draining Masters
+    command: k3s kubectl cordon master
+    register: drain_master
+
+  - debug:
+      msg:  "{{ drain_master }}"
+
+  - name: Restarting Master Server K3s
+    systemd:
+      state: restarted
+      name: k3s
+      daemon_reload: yes
+
+  - name: Uncordon Master
+    command: k3s kubectl uncordon master
+
+  - name: Waiting for Master server to stablise
+    pause:
+      seconds:  120
+#      prompt: "Press Enter to upgrade the workers"

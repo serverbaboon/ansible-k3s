@@ -1,0 +1,46 @@
+
+k3s_base_url: https://github.com/rancher/k3s/releases/download
+
+k3s_arch: ''
+
+k3s_install_path: /usr/local/bin/
+
+k3s_apt_upgrades: true
+k3s_prereqs:  true
+k3s_allow_upgrade: false
+
+# The path and file name to copy the kubeconfig file to.
+kubeconfig_path: ~/.kube
+kubeconfig_file:  config
+
+k3s_version:  v1.17.3-rc1+k3s1
+
+k3s_non_root_kubectl: false
+
+# Master Options
+# You can either group options in the relevant sections or list them all under the server options.
+# These options are command line options not env variables
+
+
+k3s_no_deploy:
+
+k3s_server_options:
+
+k3s_server_labels:
+  - raspberry=p4
+  - location=server-cupboard
+
+k3s_server_taints:
+
+# Worker Options
+# You can either group options in the relevant sections or list them all under the server options.
+# These options are command line options not env variables
+
+k3s_worker_options:
+
+k3s_worker_labels:
+  - raspberry=pi4
+  - location=server-cupboard
+
+k3s_worker_taints:
+

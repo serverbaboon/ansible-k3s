@@ -1,0 +1,35 @@
+- hosts:  all
+  become: yes
+  remote_user: ubuntu
+  gather_facts: yes
+
+  vars_files:
+    - vars/vars.yml
+
+  tasks:
+
+    - debug:
+        msg: "Upgrading K3s to {{ k3s_version }}"
+
+    - import_tasks: tasks/k3s_prereqs.yml
+    - import_tasks: tasks/download_k3s.yml
+
+
+- hosts:  master
+  become: yes
+  remote_user: ubuntu
+  gather_facts: no
+  serial: 1
+
+  tasks:
+    - import_tasks: tasks/upgrade-master.yml
+
+
+- hosts:  workers
+  become: yes
+  remote_user: ubuntu
+  gather_facts: no
+  serial: 1
+
+  tasks:
+    - import_tasks: tasks/upgrade-worker.yml

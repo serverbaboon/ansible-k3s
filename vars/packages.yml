@@ -1,0 +1,21 @@
+---
+
+required_packages:
+  - python3
+  - apt-transport-https
+  - ca-certificates
+  - python3-pip
+  - socat
+  - iptables
+  - curl
+  - util-linux
+  - grep
+  - gawk
+  - sysstat
+  - open-iscsi
+
+packages_to_remove:
+  - lxd
+  - snapd
+
+

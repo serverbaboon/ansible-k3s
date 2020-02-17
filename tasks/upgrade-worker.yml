@@ -1,0 +1,30 @@
+
+  - debug:
+      msg:  "k3s kubectl cordon {{ inventory_hostname }}"
+
+  - name: "Draining/Cordoning {{ inventory_hostname }}"
+    command:  "k3s kubectl cordon {{ inventory_hostname }}"
+    register: cordon_worker
+    delegate_to: master
+
+  - debug:
+      msg: "{{ cordon_worker }}"
+
+  - name: "Restarting {{ inventory_hostname }} k3s service"
+    systemd:
+      state: restarted
+      name: k3s-agent
+      daemon_reload: yes
+
+  - name: "Uncordon {{ inventory_hostname }}"
+    command:  "k3s kubectl uncordon {{ inventory_hostname }}"
+    register: uncordon_worker
+    delegate_to: master
+
+  - debug:
+      msg: "{{ uncordon_worker }}"
+
+  - name: "Waiting for {{ inventory_hostname }} to stabilise"
+    pause:
+      seconds:  60
+#      prompt: "Press Enter to continue"

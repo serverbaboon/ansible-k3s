@@ -1,0 +1,48 @@
+---
+
+- hosts:  workers
+  become: yes
+  remote_user: ubuntu
+  gather_facts: yes
+
+  tasks:
+    - name: Removing k3s from workers
+      command:  k3s-agent-uninstall.sh
+      args:
+        removes:  /var/lib/rancher/k3s
+      register: k3s_removal_w
+
+
+    - name: Remove Existing Node Token
+      file:
+        path: /etc/rancher/node/
+        state:  absent
+
+    - debug:
+        msg:  "{{ k3s_removal_w}}"
+
+- hosts:  master
+  become: yes
+  remote_user: ubuntu
+  gather_facts: yes
+  tasks:
+    - name: Removing k3s from Master
+      command:  k3s-uninstall.sh
+      args:
+        removes: /etc/rancher/k3s
+      register: k3s_removal_m
+
+    - debug:
+        msg:  "{{ k3s_removal_m }}"
+
+
+- hosts:  all
+
+  become: yes
+  remote_user: ubuntu
+  gather_facts: no
+
+  tasks:
+
+#    - name: Rebooting PI
+#      reboot:
