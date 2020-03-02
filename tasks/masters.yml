@@ -1,3 +1,5 @@
+- import_tasks: ./ext_database.yml
+  when: k3s_extdb
 
 - name: Copy over service files
   template:
@@ -79,4 +81,4 @@
 
 - name: This is a an option change
   include_tasks: upgrade-master.yml
-  when: service_files.changed and upgrade.stat.exists
+  when: service_files.changed and upgrade.stat.exists and k3s_allow-options_change

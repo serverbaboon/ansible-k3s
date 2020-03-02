@@ -20,8 +20,7 @@ Restart=always
 RestartSec=5s
 ExecStartPre=-/sbin/modprobe br_netfilter
 ExecStartPre=-/sbin/modprobe overlay
-ExecStart=/usr/local/bin/k3s \
-    agent \
+ExecStart=/usr/local/bin/k3s agent \
 {% if k3s_worker_labels %}
 {% for item in k3s_worker_labels %}
 --node-label {{ item }} \
@@ -37,3 +36,4 @@ ExecStart=/usr/local/bin/k3s \
 {{ item }} \
 {% endfor %}
 {% endif %}
+

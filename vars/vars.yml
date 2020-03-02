@@ -1,28 +1,43 @@
+time_zone: Europe/London
 
+# Download configuration
 k3s_base_url: https://github.com/rancher/k3s/releases/download
-
+k3s_version:  v1.17.3+k3s1
 k3s_arch: ''
 
+# Installation options
+# Control checking of OS prereqs, apt install updates and respond to k3s changes
 k3s_install_path: /usr/local/bin/
-
-k3s_apt_upgrades: true
+k3s_apt_upgrades: false
 k3s_prereqs:  true
 k3s_allow_upgrade: false
+k3s_allow_options_change: false
+
+# External Database configuration. Set k3s_ectdb to true to enable
+k3s_extdb: false
+k3s_dbhost: externaldbhost
+k3s_dbusername: k3s
+k3s_dbpassword:
+k3s_dbname: kubernetes
+k3s_dbtype: postgres
+
 
 # The path and file name to copy the kubeconfig file to.
 kubeconfig_path: ~/.kube
 kubeconfig_file:  config
 
-k3s_version:  v1.17.3-rc1+k3s1
 
-k3s_non_root_kubectl: false
+
+# Allows not root kubectl by setting service environment variable
+# See k3s_server_env and k3s_worker_env if you wish to pass others
+k3s_non_root_kubectl: true
 
 # Master Options
 # You can either group options in the relevant sections or list them all under the server options.
-# These options are command line options not env variables
-
+# These options are command line options and env variables and may overlap/clash
 
 k3s_no_deploy:
+  - local-storage
 
 k3s_server_options:
 
@@ -32,9 +47,11 @@ k3s_server_labels:
 
 k3s_server_taints:
 
+k3s_server_env:
+
 # Worker Options
 # You can either group options in the relevant sections or list them all under the server options.
-# These options are command line options not env variables
+# These options are command line options and env variables and may overlap/clash
 
 k3s_worker_options:
 
@@ -44,3 +61,4 @@ k3s_worker_labels:
 
 k3s_worker_taints:
 
+k3s_worker_env:

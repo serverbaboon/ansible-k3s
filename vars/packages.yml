@@ -19,3 +19,5 @@ packages_to_remove:
   - snapd
 
 
+python_packages:
+  - openshift

@@ -1,3 +1,14 @@
+  - name: setting timezone to {{ time_zone }}
+    timezone:
+      name: "{{ time_zone }}"
+
+  - name: Make sure target has correct hostname
+    hostname:
+      name: "{{ inventory_hostname }}"
+    when: ansible_hostname !=  inventory_hostname
+    notify:
+      - Reboot Hosts
+
   - name: Removing unwanted packages (such as snap)
     apt:
       name: "{{ packages_to_remove }}"
@@ -5,12 +16,17 @@
       purge:  true
 
   - name: Installing Core packages
-    apt:
+    package:
       name: "{{ required_packages }}"
       state: present
 
+  - name: Installing python packages
+    pip:
+      name: "{{ python_packages }}"
+      state: present
+      executable: pip3
 
-  - name: Enable required cgroup features.
+  - name: Enable required cgroup features for Ubuntu Arm/Arm64
     lineinfile:
       path: /boot/firmware/nobtcmd.txt
       backrefs: yes
@@ -18,7 +34,19 @@
       line: '\1 cgroup_enable=cpuset cgroup_enable=memory cgroup_memory=1'
       state: present
     register: cgroup_features
-  #  when: deploy_target == 'pi'
+    when: ansible_distribution == "Ubuntu" and ansible_facts.architecture in [ "aarch64", "armv7l" ]
+    notify:
+      - Reboot Hosts
+
+  - name: Enable required cgroup features for Raspbian
+    lineinfile:
+      path: /boot/cmdline.txt
+      backrefs: yes
+      regexp: '(^.+rootwait(\s+(?!cgroup_enable=cpuset cgroup_enable=memory cgroup_memory=1)[\w=/\-\.]+)*)\s*$'
+      line: '\1 cgroup_enable=cpuset cgroup_enable=memory cgroup_memory=1'
+      state: present
+    register: cgroup_features
+    when: ansible_distribution == "Raspian"
     notify:
       - Reboot Hosts
 

@@ -1,6 +1,6 @@
 
   - name: Draining Masters
-    command: k3s kubectl cordon master
+    command: "k3s kubectl drain {{ inventory_hostname }} --ignore-daemonsets=true"
     register: drain_master
 
   - debug:
@@ -17,5 +17,5 @@
 
   - name: Waiting for Master server to stablise
     pause:
-      seconds:  120
-#      prompt: "Press Enter to upgrade the workers"
+#      seconds:  180
+      prompt: "Press Enter to upgrade the workers"
