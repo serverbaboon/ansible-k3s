@@ -48,11 +48,11 @@
 
 
 - name: This is an upgrade
-  include_tasks: upgrade-worker.yml
+  include_tasks: upgrade-agents.yml
   when: upgrade.stat.exists and k3s_copy.changed and k3s_allow_upgrade
 
 - name: This is a an option change
-  include_tasks: upgrade-worker.yml
+  include_tasks: upgrade-agents.yml
   when: worker_service.changed and upgrade.stat.exists and k3s_allow_upgrade
 
 

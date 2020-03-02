@@ -1,3 +1,8 @@
 {% if k3s_non_root_kubectl %}
 K3S_KUBECONFIG_MODE="644"
 {% endif %}
+{% if k3s_server_env %}
+{% for item in k3s_server_env %}
+{{ item }}
+{% endfor %}
+{% endif %}

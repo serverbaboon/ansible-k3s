@@ -26,6 +26,9 @@ ExecStart=/usr/local/bin/k3s server \
 {{ item }},
 {%- endfor %} \
 {% endif %}
+{% if k3s_extdb %}
+--datastore-endpoint {{ k3s_dburl }} \
+{% endif %}
 {% if k3s_server_options %}
 {% for item in k3s_server_options %}
 {{ item }} \
@@ -41,5 +44,4 @@ ExecStart=/usr/local/bin/k3s server \
 --node-taint {{ item }} \
 {% endfor %}
 {% endif %}
-
 

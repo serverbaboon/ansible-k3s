@@ -1,2 +1,7 @@
 K3S_TOKEN={{ agent_token }}
 K3S_URL=https://{{ masterserver }}:6443
+{% if k3s_worker_env %}
+{% for item in k3s_worker_env %}
+{{ item }}
+{% endfor %}
+{% endif %}

@@ -1,6 +1,5 @@
 - hosts:  all
   become: yes
-  remote_user: ubuntu
   gather_facts: yes
 
   vars_files:
@@ -17,7 +16,6 @@
 
 - hosts:  master
   become: yes
-  remote_user: ubuntu
   gather_facts: no
   serial: 1
 
@@ -27,9 +25,8 @@
 
 - hosts:  workers
   become: yes
-  remote_user: ubuntu
   gather_facts: no
   serial: 1
 
   tasks:
-    - import_tasks: tasks/upgrade-worker.yml
+    - import_tasks: tasks/upgrade-agents.yml

@@ -1,0 +1,10 @@
+- name: Set postgress Db url if required.
+  set_fact:
+    k3s_dburl: postgres://{{ k3s_dbusername }}:{{ k3s_dbpassword }}@{{ k3s_dbhost }}:5432/{{ k3s_dbname }}
+  when: k3s_dbtype == "postgres"
+
+- name: Set mysql Db url if required.
+  set_fact:
+    k3s_dburl: mysql://{{ k3s_dbusername }}:{{ k3s_dbpassword }}@tcp({ k3s_dbhost }}:3306)/{{ k3s_dbname }}
+  when: k3s_dbtype == "mysql"
+
