@@ -121,7 +121,8 @@ First the phrase I hate.. '**This is not a production ready cluster**'
 
 and
 
-Assume this will destroy data somehow, especially the uninstall playbook. Also to note the destination path for the kubeconfig file, it defaults to ~/.kube/config and while creating a backup before doing anything the file will be overwritten.
+Assume this will destroy data somehow, especially the uninstall playbook. Also to note the destination path for the kubeconfig file, it defaults to ~/.kube/config.
+
 You can change the file name but it will got to the ~/.kube directory.
  
  **TODO**
