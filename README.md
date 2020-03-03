@@ -104,9 +104,11 @@ There is the option to modify the kubeconfig file to allow non sudo access to ku
 
 `k3s_non_root_kubectl: false `
 
-**Upgrade.yml** - This will download the specified version of k3s then step though all the nodes cordoning them and restarting the k3s services. 
+**Upgrade.yml** - This will download the specified version of k3s then step though all the nodes draining them and restarting the k3s services. 
 It works through the nodes one at a time pausing a set time between each. Just update the vars.yml file with the version you want.
-At the moment I am using the `kubectl  cordon` command as I am not sure about the `kubectl drain` command and dealing with the aborts.
+
+At the moment I am using the `kubectl  drain --ignore-daemonsets` command.
+
 This needs more thought and probably needs manual intervention when you have PV/PVCs. 
 This feature will most likely be removed as Rancher are implementing K3s upgrade controller which will render this feature redundant. 
 
