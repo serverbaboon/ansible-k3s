@@ -10,7 +10,7 @@
     group:  root
   with_items:
     - { src: '../templates/k3s-master-service.j2', dest: '/etc/systemd/system/k3s.service', mode: '0644' }
-    - { src: '../templates/k3s-master-service-env.j2', dest: '/etc/systemd/system/k3s.service.env', mode: '0644' }
+    - { src: '../templates/k3s-master-service-env.j2', dest: '/etc/systemd/system/k3s.service.env', mode: '0600' }
   register: service_files
 
 
@@ -61,17 +61,22 @@
   fetch:
     src: /etc/rancher/k3s/k3s.yaml
     dest: "{{ kubeconfig_path }}/{{ kubeconfig_file }}"
-    flat: true
+    flat: yes
     backup: yes
   run_once: true
-
 
 - name: Modify Kube Master address
   replace:
     path: "{{ kubeconfig_path }}/{{ kubeconfig_file }}"
     regexp: https://127.0.0.1:6443
     replace: https://{{ masterserver }}:6443
-    backup: yes
+  become: false
+  delegate_to: localhost
+
+- name: Restricting Kube Config permissions
+  file:
+    path: "{{ kubeconfig_path }}/{{ kubeconfig_file }}"
+    mode: 0600
   become: false
   delegate_to: localhost
 
@@ -81,4 +86,4 @@
 
 - name: This is a an option change
   include_tasks: upgrade-master.yml
-  when: service_files.changed and upgrade.stat.exists and k3s_allow-options_change
+  when: service_files.changed and upgrade.stat.exists and k3s_allow_options_change

@@ -1,25 +1,42 @@
-- name: Checking for existance of k3s
-  stat:
-    path: "{{ k3s_install_path }}/k3s"
-  register: upgrade
-#  delegate_to:  "{{ masterserver }}"
-  run_once: true
 
-- debug:
-    var:   upgrade.stat.exists
+- name: Checking if arm64
+  set_fact:
+    k3s_arch: k3s-arm64
+    k3s_chksum: arm64
+  when: ansible_facts.architecture == "aarch64"
+
+- name: Checking if armv7l
+  set_fact:
+    k3s_arch: k3s-armf
+    k3s_chksum: armf
+  when: ansible_facts.architecture == "armv7l"
+
+- name: Checking if amd64
+  set_fact:
+    k3s_arch: k3s
+    k3s_chksum: amd64
+  when: ansible_facts.architecture == "x86_64"
+
+- name: Abort if unsupported architecture.
+  when: ansible_facts.architecture not in [ "aarch64", "armv7l", "x86_64"]
+  fail: msg="{{ ansible_facts.architecture  }} is not currently supported"
+
+- name: Set the master server ip
+  set_fact:
+    masterserver: "{{ hostvars['master']['ansible_host'] }}"
 
 - name: Downloading k3s binary
   get_url:
-    url: "{{ k3s_base_url }}/{{ k3s_version }}/k3s{{ k3s_arch }}"
+    url: "{{ k3s_base_url }}/{{ k3s_version }}/{{ k3s_arch }}"
     dest: "{{ k3s_install_path }}/k3s"
     owner: root
     group: root
     mode: 0755
-    checksum: "sha256:{{ k3s_base_url }}/{{ k3s_version }}/sha256sum{{ k3s_arch }}.txt"
+    checksum: "sha256:{{ k3s_base_url }}/{{ k3s_version }}/sha256sum-{{ k3s_chksum }}.txt"
   register: k3s_copy
 
 - debug:
     var:  k3s_copy.changed
 
 #- notify: Its_an_upgrade
-#  when: uppgrade.stat.exists and k3s_copy.changed
+#  when: upgrade.stat.exists and k3s_copy.changed

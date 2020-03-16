@@ -1,18 +1,23 @@
 
-  - name: Draining Masters
+  - name: Draining {{ inventory_hostname }}
     command: "k3s kubectl drain {{ inventory_hostname }} --ignore-daemonsets=true"
     register: drain_master
 
   - debug:
       msg:  "{{ drain_master }}"
 
-  - name: Restarting Master Server K3s
+  - name: Restarting Master Server K3s service
     systemd:
       state: restarted
       name: k3s
       daemon_reload: yes
+    when: k3s_copy.changed and ( not upgrade_result.changed )
 
-  - name: Uncordon Master
+  - name: Restarting {{ inventory_hostname }}
+    reboot:
+    when: upgrade_result.changed
+
+  - name: Uncordon {{ inventory_hostname }}
     command: k3s kubectl uncordon master
 
   - name: Waiting for Master server to stablise
