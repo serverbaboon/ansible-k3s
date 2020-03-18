@@ -40,9 +40,9 @@ k3s_no_deploy:
   - local-storage
 
 k3s_server_options:
-  - --cluster-cidr "10.66.0.0/16"
-  - --service-cidr "10.67.0.0/16"
-  - --cluster-dns   10.67.0.10
+  - --cluster-cidr 10.66.0.0/16
+  - --service-cidr 10.67.0.0/16
+  - --cluster-dns  10.67.0.10
 
 k3s_server_labels:
   - raspberry=p4

@@ -50,3 +50,7 @@
     notify:
       - Reboot Hosts
 
+#  - name: Use iptables-legacy instead of nftables.
+#    alternatives:
+#      name: iptables
+#      path: /usr/sbin/iptables-legacy

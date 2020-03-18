@@ -15,6 +15,11 @@
       state: restarted
       name: k3s-agent
       daemon_reload: yes
+    when: k3s_copy.changed and ( not upgrade_result.changed )
+
+  - name: Restarting {{ inventory_hostname }}
+    reboot:
+    when: upgrade_result.changed
 
   - name: "Uncordon {{ inventory_hostname }}"
     command:  "k3s kubectl uncordon {{ inventory_hostname }}"
@@ -26,5 +31,5 @@
 
   - name: "Waiting for {{ inventory_hostname }} to stabilise"
     pause:
-#      seconds:  60
-      prompt: "Press Enter to continue"
+      seconds:  120
+#      prompt: "Press Enter to continue"

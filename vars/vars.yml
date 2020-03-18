@@ -8,8 +8,8 @@ k3s_arch: ''
 # Installation options
 # Control checking of OS prereqs, apt install updates and respond to k3s changes
 k3s_install_path: /usr/local/bin/
-k3s_apt_upgrades: false
 k3s_prereqs:  true
+os_apt_upgrades: false
 k3s_allow_upgrade: false
 k3s_allow_options_change: false
 
@@ -27,17 +27,18 @@ kubeconfig_path: ~/.kube
 kubeconfig_file:  config
 
 
-
-# Allows not root kubectl by setting service environment variable
+# Allows non root kubectl by setting service environment variable
 # See k3s_server_env and k3s_worker_env if you wish to pass others
 k3s_non_root_kubectl: true
+
 
 # Master Options
 # You can either group options in the relevant sections or list them all under the server options.
 # These options are command line options and env variables and may overlap/clash
 
+
 k3s_no_deploy:
-  - local-storage
+
 
 k3s_server_options:
 

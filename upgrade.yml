@@ -10,7 +10,6 @@
     - debug:
         msg: "Upgrading K3s to {{ k3s_version }}"
 
-    - import_tasks: tasks/k3s_prereqs.yml
     - import_tasks: tasks/download_k3s.yml
 
 
@@ -19,8 +18,23 @@
   gather_facts: no
   serial: 1
 
+  vars_files:
+     - vars/vars.yml
+
   tasks:
+
+    - name: Doing APT upgrade
+      apt:
+        upgrade: dist
+        update_cache: yes
+      register: upgrade_result
+      when: os_apt_upgrades
+
+    - debug:
+        var: upgrade_result.changed
+
     - import_tasks: tasks/upgrade-master.yml
+      when: k3s_copy.changed or upgrade_result.changed
 
 
 - hosts:  workers
@@ -28,5 +42,20 @@
   gather_facts: no
   serial: 1
 
+  vars_files:
+     - vars/vars.yml
+
   tasks:
+
+    - name: Doing APT upgrade
+      apt:
+        upgrade: dist
+        update_cache: yes
+      register: upgrade_result
+      when: os_apt_upgrades
+
+    - debug:
+        var: upgrade_result.changed
+
     - import_tasks: tasks/upgrade-agents.yml
+      when: k3s_copy.changed or upgrade_result.changed
